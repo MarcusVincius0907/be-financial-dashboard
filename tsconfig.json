@@ -1,0 +1,13 @@
+{
+  "exclude": ["__tests__", "__mock__", "./build", "jest.config.js"],
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "./build",
+    "esModuleInterop": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "noImplicitAny": false
+  }
+}
