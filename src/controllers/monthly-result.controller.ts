@@ -1,18 +1,18 @@
 import {
-  deleteByIdMonthlyResult,
-  insertMonthlyResult,
-  selectAllMonthlyResult,
-  selectByIdMonthlyResults,
-  updateByIdMonthlyResult,
+  deleteById,
+  insert,
+  selectAll,
+  selectById,
+  updateById,
 } from "../db/queries";
-import { MonthlyResult } from "../models";
-import { getObjectPropertyValues } from "../utils";
+import { SqliteTableNames } from "../models";
+import { getObjectPropertyKeys, getObjectPropertyValues } from "../utils";
 import { Request, Response } from "express";
 
 export default class MonthlyResultController {
-  getAll(req: Request, res: Response) {
+  async getAll(req: Request, res: Response) {
     try {
-      const resp = JSON.parse(selectAllMonthlyResult());
+      const resp = await selectAll(SqliteTableNames.MONTHLY_RESULT);
       return res.status(200).json({
         status: "ok",
         message: "Monthly Results found",
@@ -25,9 +25,12 @@ export default class MonthlyResultController {
       });
     }
   }
-  getById(req: Request, res: Response) {
+  async getById(req: Request, res: Response) {
     try {
-      const resp = JSON.parse(selectByIdMonthlyResults(req?.params?.id));
+      const resp = await selectById(
+        SqliteTableNames.MONTHLY_RESULT,
+        req?.params?.id
+      );
       return res
         .status(200)
         .json({ status: "ok", message: "Monthly Result found", payload: resp });
@@ -38,11 +41,13 @@ export default class MonthlyResultController {
       });
     }
   }
-  insert(req: Request, res: Response) {
+  async insert(req: Request, res: Response) {
     try {
-      req.body.monthlyResults.forEach((data: any) => {
-        insertMonthlyResult(getObjectPropertyValues(data));
-      });
+      await insert(
+        SqliteTableNames.MONTHLY_RESULT,
+        getObjectPropertyKeys(req.body),
+        getObjectPropertyValues(req.body)
+      );
       return res
         .status(200)
         .json({ status: "ok", message: "Monthly Result created" });
@@ -53,11 +58,14 @@ export default class MonthlyResultController {
       });
     }
   }
-  updateById(req: Request, res: Response) {
+  async updateById(req: Request, res: Response) {
     try {
-      req.body.monthlyResults.forEach((data: any) => {
-        updateByIdMonthlyResult(req?.params?.id, getObjectPropertyValues(data));
-      });
+      await updateById(
+        SqliteTableNames.MONTHLY_RESULT,
+        getObjectPropertyKeys(req.body),
+        getObjectPropertyValues(req.body),
+        req?.params?.id
+      );
       return res
         .status(200)
         .json({ status: "ok", message: "Monthly Result updated" });
@@ -68,9 +76,9 @@ export default class MonthlyResultController {
       });
     }
   }
-  deleteById(req: Request, res: Response) {
+  async deleteById(req: Request, res: Response) {
     try {
-      deleteByIdMonthlyResult(req?.params?.id);
+      await deleteById(SqliteTableNames.MONTHLY_RESULT, req?.params?.id);
       return res
         .status(200)
         .json({ status: "ok", message: "Monthly Result deleted" });

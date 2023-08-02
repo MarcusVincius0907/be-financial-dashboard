@@ -1,20 +1,20 @@
 import {
-  deleteByIdExpense,
-  insertExpense,
-  selectAllExpenses,
-  selectByIdExpenses,
-  updateByIdExpense,
+  deleteById,
+  insert,
+  selectAll,
+  selectById,
+  updateById,
 } from "../db/queries";
-import { ExpenseData, FinancialDataItem } from "../models";
-import { getObjectPropertyValues } from "../utils";
+import { FinancialDataItem, SqliteTableNames } from "../models";
+import { getObjectPropertyKeys, getObjectPropertyValues } from "../utils";
 import { Request, Response } from "express";
 
 //TODO test all methods in insomnia
 
 export default class ExpenseController {
-  getAll(req: Request, res: Response) {
+  async getAll(req: Request, res: Response) {
     try {
-      const resp = JSON.parse(selectAllExpenses());
+      const resp = await selectAll(SqliteTableNames.EXPENSE);
       return res
         .status(200)
         .json({ status: "ok", message: "Expenses found", payload: resp });
@@ -25,9 +25,9 @@ export default class ExpenseController {
       });
     }
   }
-  getById(req: Request, res: Response) {
+  async getById(req: Request, res: Response) {
     try {
-      const resp = JSON.parse(selectByIdExpenses(req.params.id));
+      const resp = await selectById(SqliteTableNames.EXPENSE, req.params.id);
       return res
         .status(200)
         .json({ status: "ok", message: "Expense found", payload: resp });
@@ -38,11 +38,13 @@ export default class ExpenseController {
       });
     }
   }
-  insert(req: Request, res: Response) {
+  async insert(req: Request, res: Response) {
     try {
-      req?.body?.expenses.forEach((data: any) => {
-        insertExpense(getObjectPropertyValues<FinancialDataItem>(data));
-      });
+      await insert(
+        SqliteTableNames.EXPENSE,
+        getObjectPropertyKeys<FinancialDataItem>(req?.body),
+        getObjectPropertyValues<FinancialDataItem>(req?.body)
+      );
       return res.status(200).json({ status: "ok", message: "Expense created" });
     } catch (e) {
       return res.status(404).json({
@@ -51,14 +53,15 @@ export default class ExpenseController {
       });
     }
   }
-  updateById(req: Request, res: Response) {
+  async updateById(req: Request, res: Response) {
     try {
-      req?.body?.expenses.forEach((data: any) => {
-        updateByIdExpense(
-          req?.params?.id,
-          getObjectPropertyValues<FinancialDataItem>(data)
-        );
-      });
+      await updateById(
+        SqliteTableNames.EXPENSE,
+        getObjectPropertyKeys<FinancialDataItem>(req?.body),
+        getObjectPropertyValues<FinancialDataItem>(req?.body),
+        req?.params?.id
+      );
+
       return res.status(200).json({ status: "ok", message: "Expense updated" });
     } catch (e) {
       return res.status(404).json({
@@ -67,9 +70,9 @@ export default class ExpenseController {
       });
     }
   }
-  deleteById(req: Request, res: Response) {
+  async deleteById(req: Request, res: Response) {
     try {
-      const resp = deleteByIdExpense(req?.params?.id);
+      await deleteById(SqliteTableNames.EXPENSE, req?.params?.id);
       return res.status(200).json({ status: "ok", message: "Expense deleted" });
     } catch (e) {
       return res.status(404).json({

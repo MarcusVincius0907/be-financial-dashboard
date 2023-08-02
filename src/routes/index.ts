@@ -25,7 +25,7 @@ routes.get("/monthly", monthlyResultController.getAll);
 routes.get("/monthly/:id", monthlyResultController.getById);
 routes.post("/monthly", monthlyResultController.insert);
 routes.put("/monthly/:id", monthlyResultController.updateById);
-routes.delete("/monthly/:id", expenseController.deleteById);
+routes.delete("/monthly/:id", monthlyResultController.deleteById);
 
 const dbController = new DBController();
 routes.get("/up", dbController.up);

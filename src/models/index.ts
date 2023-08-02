@@ -15,6 +15,7 @@ export type IncomeData = Array<FinancialDataItem>;
 
 export interface MonthlyResult {
   id: string;
+  month: string;
   expenseAmount: string;
   incomeAmount: string;
   totalAmount: string;

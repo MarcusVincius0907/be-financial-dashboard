@@ -1,18 +1,18 @@
 import {
-  deleteByIdIncome,
-  insertIncome,
-  selectAllIncomes,
-  selectByIdIncomes,
-  updateByIdIncome,
+  deleteById,
+  insert,
+  selectAll,
+  selectById,
+  updateById,
 } from "../db/queries";
-import { IncomeData, FinancialDataItem } from "../models";
-import { getObjectPropertyValues } from "../utils";
+import { IncomeData, FinancialDataItem, SqliteTableNames } from "../models";
+import { getObjectPropertyKeys, getObjectPropertyValues } from "../utils";
 import { Request, Response } from "express";
 
 export default class IncomeController {
-  getAll(req: Request, res: Response) {
+  async getAll(req: Request, res: Response) {
     try {
-      const resp = JSON.parse(selectAllIncomes());
+      const resp = await selectAll(SqliteTableNames.INCOME);
       return res
         .status(200)
         .json({ status: "ok", message: "Incomes found", payload: resp });
@@ -23,9 +23,9 @@ export default class IncomeController {
       });
     }
   }
-  getById(req: Request, res: Response) {
+  async getById(req: Request, res: Response) {
     try {
-      const resp = JSON.parse(selectByIdIncomes(req?.params?.id));
+      const resp = await selectById(SqliteTableNames.INCOME, req?.params?.id);
       return res
         .status(200)
         .json({ status: "ok", message: "Income found", payload: resp });
@@ -36,11 +36,13 @@ export default class IncomeController {
       });
     }
   }
-  insert(req: Request, res: Response) {
+  async insert(req: Request, res: Response) {
     try {
-      req.body.incomes.forEach((data: any) => {
-        insertIncome(getObjectPropertyValues(data));
-      });
+      await insert(
+        SqliteTableNames.INCOME,
+        getObjectPropertyKeys(req.body),
+        getObjectPropertyValues(req.body)
+      );
       return res.status(200).json({ status: "ok", message: "Income created" });
     } catch (e) {
       return res.status(404).json({
@@ -49,11 +51,14 @@ export default class IncomeController {
       });
     }
   }
-  updateById(req: Request, res: Response) {
+  async updateById(req: Request, res: Response) {
     try {
-      req?.body?.incomes.forEach((data: any) => {
-        updateByIdIncome(req.params?.id, getObjectPropertyValues(data));
-      });
+      await updateById(
+        SqliteTableNames.INCOME,
+        getObjectPropertyKeys(req.body),
+        getObjectPropertyValues(req.body),
+        req.params?.id
+      );
       return res.status(200).json({ status: "ok", message: "Income updated" });
     } catch (e) {
       return res.status(404).json({
@@ -62,9 +67,9 @@ export default class IncomeController {
       });
     }
   }
-  deleteById(req: Request, res: Response) {
+  async deleteById(req: Request, res: Response) {
     try {
-      deleteByIdIncome(req?.params?.id);
+      await deleteById(SqliteTableNames.INCOME, req?.params?.id);
       return res.status(200).json({ status: "ok", message: "Income deleted" });
     } catch (e) {
       return res.status(404).json({

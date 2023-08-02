@@ -9,3 +9,9 @@ export function getObjectPropertyValues<T>(
 ): string[] {
   return Object.values(obj).map((value) => String(value));
 }
+
+export function getObjectPropertyKeys<T>(
+  obj: ObjectWithProperties<T>
+): string[] {
+  return Object.keys(obj).map((value) => String(value));
+}
